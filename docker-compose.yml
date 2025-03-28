@@ -4,9 +4,9 @@ services:
   web:
     build: .
     command: >
-      sh -c "python manage.py makemigrations bot_admin_panel &&
+      sh -c "python manage.py makemigrations &&
              python manage.py migrate &&
-             python tg_bot/main.py"
+             python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/app
       - ./logs:/app/logs
@@ -14,19 +14,30 @@ services:
       - "8000:8000"
     env_file:
       - .env
-    environment:
-      - DJANGO_SETTINGS_MODULE=admin_panel.settings
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+
+  bot:
+    build: .
+    command: >
+      sh -c "python tg_bot/main.py > /app/logs/bot.log 2>&1"
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    env_file:
+      - .env
     depends_on:
       - postgres
       - redis
 
   celery:
     build: .
-    command: celery -A admin_panel worker --loglevel=info
+    command: >
+      sh -c "celery -A admin_panel worker --loglevel=info > /app/logs/celery.log 2>&1"
     volumes:
       - .:/app
+      - ./logs:/app/logs
     env_file:
       - .env
     environment:
@@ -39,19 +50,21 @@ services:
 
   postgres:
     image: postgres:13
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - .env
-    environment:
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      - ./logs:/var/log/postgresql
     ports:
       - "5432:5432"
 
   redis:
     image: redis:6
+    command: redis-server --logfile /data/redis.log
+    volumes:
+      - ./logs:/data
     ports:
       - "6379:6379"
 

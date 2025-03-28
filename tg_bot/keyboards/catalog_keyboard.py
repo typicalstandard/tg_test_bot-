@@ -29,18 +29,14 @@ async def handle_page_switch(items, current_page: int, callback_prefix: str, ext
 
 def build_product_keyboard(current_index: int, subcategory_id: int, quantity: int, products_count: int,
                            product_id: int) -> InlineKeyboardMarkup:
-    """
-    Формирует клавиатуру с кнопками изменения количества, пагинации и добавления в корзину.
-    """
     kb = InlineKeyboardMarkup(inline_keyboard=[])
 
-    # Кнопки изменения количества
     kb.inline_keyboard.append([
         InlineKeyboardButton(text="➖", callback_data=f"quantity_dec_{current_index}_{subcategory_id}_{quantity}"),
         InlineKeyboardButton(text="➕", callback_data=f"quantity_inc_{current_index}_{subcategory_id}_{quantity}")
     ])
 
-    # Кнопки пагинации
+
     if current_index > 0:
         kb.inline_keyboard.append([
             InlineKeyboardButton(text="⬅️ Назад",
