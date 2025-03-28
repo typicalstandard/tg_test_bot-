@@ -96,7 +96,7 @@ async def confirm_no_handler(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data == "cart")
 async def cart_button_handler(callback_query: types.CallbackQuery):
-    await callback_query.answer("Обновление корзины...")  # Уведомление
+    await callback_query.answer("Обновление корзины...")
 
     try:
         client = await sync_to_async(Client.objects.get)(telegram_id=callback_query.from_user.id)
@@ -106,7 +106,7 @@ async def cart_button_handler(callback_query: types.CallbackQuery):
         )
 
         if not cart_items:
-            await callback_query.message.edit_text("🛒 Ваша корзина пуста.")
+            await callback_query.message.edit_text("Ваша корзина пуста.")
             return
 
         total = sum(item.quantity * item.product.price for item in cart_items)
@@ -120,7 +120,6 @@ async def cart_button_handler(callback_query: types.CallbackQuery):
         current_page = int(callback_query.data.split("_")[1]) if "_" in callback_query.data else 0
         keyboard = generate_cart_buttons(cart_items, current_page, items_per_page)
 
-        # Обновление сообщения
         await callback_query.message.edit_text("\n".join(text_lines), reply_markup=keyboard)
     except Client.DoesNotExist:
         await callback_query.answer("Клиент не найден.", show_alert=True)
@@ -135,7 +134,7 @@ async def cart_pagination_handler(callback_query: types.CallbackQuery):
 
 @router.callback_query(lambda c: c.data.startswith("delete_"))
 async def delete_item_handler(callback_query: types.CallbackQuery):
-    await callback_query.answer("Удаление товара...")  # Уведомление
+    await callback_query.answer("Удаление товара...")
 
     try:
         item_id = int(callback_query.data.split("_")[1])
@@ -147,7 +146,7 @@ async def delete_item_handler(callback_query: types.CallbackQuery):
         )
 
         if cart_items:
-            await cart_button_handler(callback_query)  # Обновляем отображение корзины
+            await cart_button_handler(callback_query)
         else:
             await callback_query.message.edit_text("🛒 Ваша корзина пуста.")
     except ValueError:

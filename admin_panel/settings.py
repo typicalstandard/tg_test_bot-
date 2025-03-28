@@ -11,9 +11,14 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -74,16 +79,8 @@ WSGI_APPLICATION = 'admin_panel.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-from pathlib import Path
-from dotenv import load_dotenv
-import os
 
-# Указываем путь к .env файлу
-BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(os.path.join(BASE_DIR, '.env'))
 
-# Используем переменные окружения
-BOT_TOKEN = os.getenv('BOT_TOKEN')
 
 DATABASES = {
     'default': {
@@ -141,9 +138,13 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# URL для медиафайлов
 MEDIA_URL = '/media/'
 
-# Локальный путь для сохранения медиафайлов
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
+
+BOT_TOKEN = os.getenv('BOT_TOKEN')
+
 

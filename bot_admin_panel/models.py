@@ -57,20 +57,13 @@ class Cart(models.Model):
         return f"Client: {self.client}, Product: {self.product}, Quantity: {self.quantity}"
 
 
-
 class FAQ(models.Model):
-    question = models.TextField(verbose_name="Вопрос")
-    answer = models.TextField(blank=True, null=True, verbose_name="Ответ")
-    created_at = models.DateTimeField(auto_now_add=True)
+    question = models.CharField(max_length=255, verbose_name="Вопрос")
+    answer = models.TextField(verbose_name="Ответ", default="Ответ отсутствует")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
 
     def __str__(self):
         return self.question
 
 
-class UserQuestion(models.Model):
-    telegram_id = models.BigIntegerField(verbose_name="ID пользователя")
-    question = models.TextField(verbose_name="Вопрос")
-    asked_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.question

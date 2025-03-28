@@ -18,7 +18,6 @@ def build_confirmation_keyboard(product_id: int, subcategory_id: int, current_in
 def generate_cart_buttons(cart_items, current_page, items_per_page):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[])
 
-    # Корректный расчёт индексов
     start_index = current_page * items_per_page
     end_index = min(start_index + items_per_page, len(cart_items))
     if start_index >= len(cart_items):

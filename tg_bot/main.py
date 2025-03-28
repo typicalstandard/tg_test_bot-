@@ -10,19 +10,21 @@ django.setup()
 
 import asyncio
 from aiogram import Bot, Dispatcher, Router
+from aiogram.fsm.storage.redis import RedisStorage
+from redis.asyncio import Redis
+
+from bot_config import BOT_TOKEN, REDIS_URL
 from handlers import start, catalog, cart, faq, delivery
-from dotenv import load_dotenv
 
-load_dotenv(dotenv_path="../.env")
-
-BOT_TOKEN = os.getenv('BOT_TOKEN')
+redis = Redis.from_url(REDIS_URL)
+storage = RedisStorage(redis)
 
 async def main():
     bot = Bot(token=BOT_TOKEN)
-    dp = Dispatcher()
+    dp = Dispatcher(storage=storage)
     router = Router()
 
-    # Регистрируем обработчики
+
     start.register_handlers(router)
     catalog.register_handlers(router)
     cart.register_handlers(router)
@@ -35,3 +37,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+

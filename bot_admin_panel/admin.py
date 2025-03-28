@@ -1,15 +1,14 @@
-from asgiref.sync import async_to_sync
+from .tasks import send_broadcast_task
 from django.contrib import admin
 from .models import Client, Broadcast
-from aiogram import Bot
-import os
+
+
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'telegram_id', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('name', 'telegram_id')
-
 
 
 
@@ -21,13 +20,10 @@ class BroadcastAdmin(admin.ModelAdmin):
     def send_broadcast_action(self, request, queryset):
         for broadcast in queryset.filter(sent=False):
             try:
-                broadcast.sent = True
-                broadcast.save()
-                self.message_user(request, f"Рассылка '{broadcast.subject}' успешно отправлена.")
+                send_broadcast_task.delay(broadcast.id)
+                self.message_user(request, f"Задача на рассылку '{broadcast.subject}' поставлена в очередь.")
             except Exception as e:
-                self.message_user(request, f"Ошибка при отправке рассылки: {e}", level='error')
+                self.message_user(request, f"Ошибка при постановке задачи: {e}", level='error')
 
     send_broadcast_action.short_description = "Отправить выбранные рассылки"
-
-
 

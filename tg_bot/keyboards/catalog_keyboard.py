@@ -1,6 +1,4 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-
 async def handle_page_switch(items, current_page: int, callback_prefix: str, extra_param: str = None):
     ITEMS_PER_PAGE = 3
     start_idx = current_page * ITEMS_PER_PAGE
