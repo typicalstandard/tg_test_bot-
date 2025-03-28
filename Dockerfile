@@ -1,21 +1,16 @@
-# Используем оптимизированный базовый образ Python
 FROM python:3.10-slim
 
-# Определяем рабочую директорию внутри контейнера
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Копируем файл зависимостей в контейнер
 COPY requirements.txt /app/
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Обновляем pip и устанавливаем зависимости
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+COPY . /app/
 
-# Копируем исходный код приложения в контейнер
-COPY . /app
 
-# Создаем каталог для логов (для последующего монтирования volume)
-RUN mkdir -p /app/logs
-
-# Команда заведения Django-сервера.
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "tg_bot/main.py"]
